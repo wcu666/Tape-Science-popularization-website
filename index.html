@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigation Influences of Pulling Speed on Stripe Pattern Formation of Peeled Tape</title>
+    <style>
+        /* ================= 1. 全域樣式 ================= */
+        body {
+            font-family: 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
+            color: #2c3e50;
+            line-height: 1.85;
+            margin: 0;
+            padding: 0;
+            background-color: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex: 1;
+        }
+
+        /* 頂部頁籤導覽列 */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #dcdde1;
+            margin-bottom: 40px;
+            font-size: 15px;
+            color: #7f8c8d;
+            flex-wrap: wrap;
+        }
+        .navbar .tab-btn {
+            cursor: pointer;
+            padding-bottom: 8px;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        .navbar .tab-btn:hover {
+            color: #2c3e50;
+        }
+        .navbar .tab-btn.active {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .navbar .tab-btn.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 100%;
+            height: 2.5px;
+            background-color: #c0392b;
+        }
+
+        /* 標題區域 */
+        .header-section {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+        .main-title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #1a252f;
+            margin-bottom: 15px;
+            line-height: 1.35;
+            letter-spacing: 0.5px;
+        }
+        .sub-title {
+            font-size: 16px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* 頁籤內容隱藏與切換動畫 */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active-tab {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= 2. 卡片區域 (Card Layout) ================= */
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f2f6;
+        }
+
+        .section-title {
+            font-size: 21px;
+            font-weight: 700;
+            color: #2c3e50;
+            border-left: 4px solid #c0392b;
+            padding-left: 14px;
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #4a5568;
+            text-align: justify;
+            margin-bottom: 16px;
+        }
+        p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ================= 3. 圖片組件 ================= */
+        .image-zone {
+            display: flex;
+            gap: 24px;
+            margin-top: 15px;
+        }
+        .figure-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 250px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-wrapper-wide {
+            width: 100%;
+            height: 380px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .image-wrapper-wide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .figure-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .figure-caption {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        /* ================= 4. 頁尾「下一頁」按鈕 ================= */
+        .page-footer-nav {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        .next-page-btn {
+            background-color: #c0392b;
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(192, 57, 43, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .next-page-btn:hover {
+            background-color: #a93226;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(192, 57, 43, 0.3);
+        }
+
+        /* ================= 5. 其他輔助元素 ================= */
+        ul.mechanism-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 15px;
+        }
+        ul.mechanism-list li {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 16px;
+            padding-left: 20px;
+            position: relative;
+            text-align: justify;
+        }
+        ul.mechanism-list li::before {
+            content: "■";
+            color: #c0392b;
+            font-size: 12px;
+            position: absolute;
+            left: 0;
+            top: 3px;
+        }
+
+        .team-box {
+            background-color: #f8fafc;
+            border-radius: 6px;
+            padding: 20px 25px;
+            border-left: 4px solid #2c3e50;
+            margin-top: 30px;
+        }
+        .team-box h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 17px;
+        }
+
+        hr.divider {
+            border: 0;
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 25px 0;
+        }
+        .image-center-free {
+            text-align: center;
+            margin: 25px 0;
+        }
+        .image-center-free img {
+            max-width: 50%;
+            height: auto;
+        }
+        .conclusion-subtitle {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        /* ================= 6. 頁尾版權聲明 (Footer) ================= */
+        .site-footer {
+            background-color: #f1f2f6;
+            padding: 35px 20px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: auto;
+        }
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 920px;
+            margin: 0 auto;
+            text-align: center;
+            gap: 20px;
+        }
+        .footer-logo {
+            max-width: 80px;
+            height: auto;
+        }
+        .footer-text {
+            font-size: 13.5px;
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        @media (min-width: 768px) {
+            .footer-content {
+                flex-direction: row;
+                text-align: left;
+                justify-content: flex-start;
+            }
+            .footer-logo {
+                margin-right: 25px;
+            }
+        }
+
+        /* ================= 7. 手機/電腦響應式相容 (RWD) ================= */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            /* 導覽列自動換行與縮小間距 */
+            .navbar {
+                gap: 10px;
+                margin-bottom: 30px;
+            }
+            .navbar .tab-btn {
+                font-size: 14px;
+            }
+            
+            /* 標題字體縮小 */
+            .main-title {
+                font-size: 22px;
+            }
+            .sub-title {
+                font-size: 14px;
+            }
+            
+            /* 卡片邊距縮小 */
+            .card {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+            
+            /* 圖片區塊改為上下排列 */
+            .image-zone {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .image-wrapper {
+                height: 200px; /* 手機版圖片高度微調 */
+            }
+            .image-wrapper-wide {
+                height: 250px;
+            }
+            
+            /* 文字大小微調 */
+            .section-title {
+                font-size: 19px;
+            }
+            p, ul.mechanism-list li {
+                font-size: 15px;
+            }
+            
+            /* 互動模擬器容器高度自適應 */
+            .card iframe {
+                height: 500px !important;
+            }
+            
+            /* 內容圖片寬度滿版 */
+            .image-center-free img {
+                width: 80% !important;
+            }
+        }
+
+        /* 壁報特定樣式 */
+        .poster-wrapper {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-top: 25px;
+        }
+        .poster-wrapper img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+    </style>
+        
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <div class="navbar">
+            <div class="tab-btn active" data-tab="tab1" onclick="switchTab('tab1')">1. 前言</div>
+            <div class="tab-btn" data-tab="tab2" onclick="switchTab('tab2')">2. 實驗裝置</div>
+            <div class="tab-btn" data-tab="tab3" onclick="switchTab('tab3')">3. 實驗原理</div>
+            <div class="tab-btn" data-tab="tab4" onclick="switchTab('tab4')">4. 實驗一</div>
+            <div class="tab-btn" data-tab="tab5" onclick="switchTab('tab5')">5. 實驗二</div>
+            <div class="tab-btn" data-tab="tab6" onclick="switchTab('tab6')">6. 結論與參考</div>
+            <div class="tab-btn" data-tab="tab7" onclick="switchTab('tab7')">7. 互動模擬器</div>
+            <div class="tab-btn" data-tab="tab8" onclick="switchTab('tab8')">8. A1 壁報</div>
+        </div>
+
+  
+        <div class="header-section">
+            <div class="main-title">
+                Investigation Influences of Pulling Speed <br>
+                on Stripe Pattern Formation of Peeled Tape
+            </div>
+            <div class="sub-title">
+                國立中正大學 ｜ 基礎物理實驗學 2B 期末專題 ｜ 2026 物理教育聯合會議（大專生組）
+            </div>
+        </div>
+
+        <!-- ================= 頁籤 1：前言 ================= -->
+        <div id="tab1" class="tab-content active-tab">
+            <div class="card">
+                <div class="section-title">日常現象中的物理問題</div>
+                <p>
+                    撕開透明膠帶是日常生活中極為常見的動作，但若仔細觀察被剝離後的膠帶表面，會發現膠帶上常呈現「白色條紋」與「透明條紋」交錯發生的現象。當拉扯速率改變時，撕裂時的阻力變化、發出的聲音高低，以及條紋間的分布距離都會隨之發生變化。這些源於日常觀察的物理細節，背後其實蘊含著高分子黏膠在動態拉扯下的複雜界面力學行為。
+                </p>
+            </div>
+            <div class="card">
+                <div class="section-title">條紋特徵與剝離現象觀察</div>
+                <div class="image-zone">
+                    <div class="figure-item">
+                        <div class="image-wrapper">
+                            <img src="tape_dispenser.png" alt="自製裝置剝離膠帶之側拍紀錄"> 
+                        </div>
+                        <div class="figure-title">圖 1.1 自製裝置剝離膠帶之側拍紀錄</div>
+                        <div class="figure-caption">
+                            側拍馬達牽引膠帶的動態過程。在剝離交界處可見黏膠受力拉伸的「拉絲」現象。改變牽引速率會影響膠帶脫離的力學行為與張力變化，此為本研究的發想起點。
+                        </div>
+                    </div>
+                    <div class="figure-item">
+                        <div class="image-wrapper">
+                            <img src="Transparent and white zone 's figure.png" alt="剝離後膠帶片段之特徵區域標示"> 
+                        </div>
+                        <div class="figure-title">圖 1.2 剝離後膠帶之特徵區域</div>
+                        <div class="figure-caption">
+                            剝離後的膠帶具備兩種視覺特徵：White Zone 因黏膠內部產生微觀孔洞而呈現白色不透明；Transparent Zone 則因平滑脫離而維持原本的透明外觀。
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section-title">研究核心與探討方向</div>
+                <p>
+                    當膠帶自表面剝離時，黏膠層會經歷「黏著累積張力（Stick）」與「快速滑移釋放（Slip）」的動態循環。本研究旨在建立一套能穩定且定量控制牽引速度的實驗系統探討：
+                </p>
+                <p>
+                    1. <strong>牽引速率</strong>對膠帶剝離過程中臨界拉力與動態張力變化的影響。<br>
+                    2. 定量分析不同牽引速率下，膠帶上 <strong>White Zone 寬度</strong>、<strong>Transparent Zone 寬度</strong> 以及整體<strong>條紋間距</strong>的演變規律。
+                </p>
+            </div>
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab2')">下一頁：2. 實驗裝置 &rarr;</button>
+            </div>
+        </div>
+
+        <!-- ================= 頁籤 2：實驗裝置 ================= -->
+        <div id="tab2" class="tab-content">
+            <div class="card">
+                <div class="section-title">三滑輪牽引實驗系統</div>
+                <p>
+                    為探討透明膠帶剝離過程中，牽引速率對黏滑不穩定條紋特徵的影響，我們自行設計並架設一套結合「步進馬達」與「拉力感測器」的三滑輪牽引實驗系統，以實現規律且可量化的觀測環境。
+                </p>
+                <div class="image-wrapper-wide">
+                    <img src="Experimental Setup.png" alt="三滑輪牽引實驗系統裝置圖"> 
+                </div>
+                <div class="figure-title">圖 2.1 三滑輪牽引實驗系統裝置圖</div>
+                <div class="figure-caption" style="text-align: center; margin-bottom: 20px;">
+                    本裝置主要由步進馬達、拉力感測器、滑輪組（一個動滑輪與兩個定滑輪）及金屬夾具所構成，可控制剝離速率並即時擷取動態張力數據。
+                </div>
+                <hr class="divider">
+                <div class="section-title">系統運行與測量機制</div>
+                <p>
+                    本實驗系統透過微控器與機械結構的緊密配合，確保每一次剝離動作的穩定性。詳細的運行步驟與機制如下：
+                </p>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>膠帶固定與滑輪組導引：</strong> 首先，以金屬夾具將透明膠帶的末端牢牢固定。與金屬夾具連接的牽引線會穿過一組由「一個動滑輪與兩個定滑輪」所組成的滑輪系統，此設計能穩定牽引方向並確保受力均勻。
+                    </li>
+                    <li>
+                        <strong>速率控制：</strong> 牽引線的一端固定於步進馬達的轉軸上。我們透過撰寫微控器程式，藉由改變程式的延遲時間來調整步進馬達的轉速，進而實現規律、絕對可控的膠帶剝離牽引速率。
+                    </li>
+                    <li>
+                        <strong>即時張力量測：</strong> 牽引線的另一端則連接至拉力感測器。當馬達啟動並拉伸膠帶時，拉力感測器能即時量測並記錄下微小的動態張力變化。
+                    </li>
+                </ul>
+            </div>
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab3')">下一頁：3. 實驗原理 &rarr;</button>
+            </div>
+        </div>
+
+        <!-- ================= 頁籤 3：實驗原理 ================= -->
+        <div id="tab3" class="tab-content">
+            <div class="card">
+                <div class="section-title">1. 巨觀動力學：彈簧-滑塊模型（Spring-Block Model）</div>
+                <p>
+                    本實驗的黏滑不穩定性（Stick-Slip Instability）可透過經典的「彈簧-滑塊模型」來解釋。我們將膠帶基材視為一條具備等效彈力常數 $k$ 的彈簧，而剝離交界點則視為滑塊。給定一個恆定的馬達牽引速度 $v$ 與剝離點的瞬時位移 $x$，其動力學行為可由以下運動方程式描述：
+                </p>
+                <div style="text-align: center; font-size: 18px; margin: 20px 0; font-weight: bold; color: #c0392b;">
+                    $$m\ddot{x}=k(vt-x)-F(\dot{x})$$
+                </div>
+                <p>
+                    其中 $m$ 為等效質量，$k(vt-x)$ 為膠帶拉伸累積的彈性恢復力，$F(\dot{x})$ 則是高度依賴瞬時速度 $\dot{x}$ 的非線性剝離阻力。系統據此經歷以下週期：
+                </p>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>黏著階段（Stick Phase，$\dot{x} \approx 0$）：</strong> 剝離點被黏膠鎖住，馬達持續牽引使系統累積龐大的彈性位能。當彈性力 $k(vt-x)$ 突破靜態極限時，即觸發下一階段。
+                    </li>
+                    <li>
+                        <strong>滑移階段（Slip Phase，$\dot{x} &gt; v$）：</strong> 系統瞬間滑移，累積的彈性位能瞬間轉換為動能與斷裂能。這個彈性位能的累積與釋放週期，直接決定了膠帶上條紋的空間週期。
+                    </li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="section-title">2. 微觀機制：底波拉數與高分子黏彈性</div>
+                <p>
+                    壓敏膠（Acrylic adhesive）是一種高分子流體，其表現出液態或固態的力學行為，取決於無因次量 <strong>底波拉數（Deborah Number, $De$）</strong>。其定義為 $De=\frac{\tau}{t_{obs}}$，其中 $\tau$ 為高分子鏈的鬆弛時間，$t_{obs}$ 為觀察時間（與牽引速率成反比）。
+                </p>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>低速牽引（$De &lt; 1$）：</strong> 觀察時間充足，高分子鏈有時間鬆弛，黏膠處於「橡膠態（Rubbery state）」。此時受力會產生巨觀的拉絲現象，在膠帶上留下粗糙表面，即我們觀察到的 <strong>White Zone</strong>。
+                    </li>
+                    <li>
+                        <strong>高速牽引（$De &gt; 1$）：</strong> 牽引時間極短，黏膠被迫進入「玻璃態（Glassy state）」。此時發生脆性斷裂與乾淨的界面破壞，剝離面維持平整，即 <strong>Transparent Zone</strong>。
+                    </li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="section-title">3. 剝離拉力特徵：橡膠平坦區與黏彈硬化效應</div>
+                <p>
+                    承接上述底波拉數（$De$）所主導的相態轉換，我們可進一步從高分子流變學的角度，解釋不同相態下剝離拉力隨速率變化的力學特徵：
+                </p>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>橡膠平坦區（極慢區）：</strong> 當 $De < 1$ 時，高分子處於完全鬆弛的橡膠態。在力學上，此區間對應高分子的「橡膠平坦區（Rubbery plateau）」，意味著材料的黏彈模數（彈性）幾乎是一個常數，不會隨著形變速率的微小變化而改變。因此，在極慢速牽引下，剝離拉力對速度不敏感，奠定了數據趨近水平的物理基礎。
+                    </li>
+                    <li>
+                        <strong>黏彈硬化效應（極快區）：</strong> 當 $De > 1$ 時，黏膠被迫進入玻璃態並發生脆性斷裂。雖然巨觀拉絲消失使整體力量基準下降，但微觀層面上，若牽引速率繼續對數級別地提升（應變率急遽增加），高分子材料會產生「黏彈硬化（Viscoelastic stiffening）」現象。其等效黏彈模數會隨速率增加而變大（材料變得更僵硬），導致克服界面斷裂所需的拉力也隨之提高，這解釋了快速區拉力呈現上升趨勢的力學原因。
+                    </li>
+                </ul>
+            </div>
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab4')">下一頁：4. 實驗一 &rarr;</button>
+            </div>
+        </div>
+        
+
+        <!-- ================= 頁籤 4：實驗一 ================= -->
+        <div id="tab4" class="tab-content">
+            <div class="card">
+                <div class="section-title">尋找臨界牽引速率與三區劃分</div>
+                <p>
+                    為了界定膠帶剝離時黏滑現象發生的條件，我們透過微控器逐步調整步進馬達的牽引速率，並記錄對應的平均剝離拉力。實驗結果顯示，系統動態特徵隨牽引速率的增加可清晰劃分為「三大區域」，並對「極慢區」與「極快區」分別進行趨勢線擬合：
+                </p>
+                <div class="image-center-free">
+                    <img src="figure_3_1.png" alt="圖 3.1 牽引速率與剝離拉力之三區劃分圖">
+                </div>
+                <div class="figure-title">圖 3.1 牽引速率與剝離拉力之三區劃分圖</div>
+                <div class="figure-caption" style="text-align: center; margin-bottom: 20px;">
+                    圖中繪製了極慢區與極快區之擬合趨勢線；中間不穩定區則呈現劇烈波動之數據散佈。
+                </div>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>Ⅰ. 極慢速區（水平趨勢線）：</strong> 
+                        在此極慢速範圍內，高分子底波拉數極小（$De \ll 1$），黏膠處於橡膠態，剝離時伴隨顯著的黏膠拉絲現象。因為高分子鏈具備充分時間鬆弛（處於力學上的橡膠平坦區），其黏彈模數對速率變化不敏感。整體剝離阻力維持在一個穩定的常數，因此擬合趨勢線合理地趨近於水平。
+                    </li>
+                    <li>
+                        <strong>Ⅱ. 不穩定區（劇烈震盪數據點）：</strong> 
+                        當速度進入不穩定區，系統陷入黏滑（Stick-Slip）動態循環。力量在「累積彈性位能（Stick）」與「瞬間釋放（Slip）」之間高速切換，導致數據點在固定區間內產生寬幅的劇烈震盪。
+                    </li>
+                    <li>
+                        <strong>Ⅲ. 快速區（上升趨勢線）：</strong> 
+                        跨過臨界速度後，底波拉數極大（$De \gg 1$），黏膠轉變為玻璃態，剝離面轉為乾淨的脆性斷裂，使整體力量基準顯著低於不穩定區。然而，隨著牽引速率繼續對數級別地提升，受高分子的<strong>「黏彈硬化效應（Viscoelastic stiffening）」</strong>影響，材料在極短時間內來不及形變，表現得更為僵硬。為了克服變硬的界面，剝離阻力會隨速度增加而變大，因此在此區段的擬合趨勢線呈現向上攀升的特徵。
+                    </li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="section-title">條紋特徵與動態拉力 (F-t) 關係</div>
+                <p>
+                    除了巨觀的平均拉力外，我們進一步將攝影機擷取的「膠帶條紋影像」與拉力感測器同步記錄的「力量-時間 (F-t) 曲線」進行比對，以驗證微觀剝離機制。
+                </p>
+                <div class="image-wrapper-wide">
+                    <img src="stripe_and_ft_graphs.png" alt="圖 3.2 不同速率下之條紋與 F-t 曲線對照 (慢至快)">
+                </div>
+                <div class="figure-title">圖 3.2 條紋影像與動態拉力 (F-t) 曲線對照圖</div>
+                <p style="margin-top: 20px;">
+                    上圖由左至右分別排列了從「極慢速」、「不穩定臨界」一路到「快速」牽引條件下的對應結果：
+                </p>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>左側（慢速牽引）：</strong> F-t 曲線平緩，系統穩定處於黏滯拉伸狀態，膠帶影像為均勻的白色霧狀表面。
+                    </li>
+                    <li>
+                        <strong>中間（不穩定區 / 臨界點）：</strong> F-t 曲線出現非常明顯且規律的<strong>「鋸齒狀（Sawtooth）震盪」</strong>。每一個上升段對應 White Zone 生成，瞬間掉落段對應 Transparent Zone 產生。條紋寬度與震盪週期完美吻合。
+                    </li>
+                    <li>
+                        <strong>右側（快速牽引）：</strong> 拉力曲線整體數值下降且趨於穩定，膠帶影像顯示無拉絲的乾淨透明面。
+                    </li>
+                </ul>
+            </div>
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab5')">下一頁：5. 實驗二 &rarr;</button>
+            </div>
+        </div>
+
+        <!-- ================= 頁籤 5：實驗二 ================= -->
+        <div id="tab5" class="tab-content">
+            <div class="card">
+                <div class="section-title">牽引速率對條紋型態之定量分析</div>
+                <p>
+                    在確認了巨觀拉力與牽引速率的關係後，本實驗進一步針對不穩定區（黏滑現象發生區）的膠帶條紋特徵進行定量分析。我們測量了不同牽引速率下，膠帶表面的「白色條紋（White Zone）」、「透明條紋（Transparent Zone）」長度，以及「整體條紋間距（Stripe spacing）」，並繪製成下方的圖 5.1。
+                </p>
+
+                <div class="image-center-free">
+                    <img src="Morphology_vs_Velocity_Physics_Fitted.png" alt="圖 5.1 牽引速率與條紋型態特徵長度關係圖">
+                </div>
+                <div class="figure-title">圖 5.1 牽引速率與條紋型態特徵長度關係圖</div>
+                <div class="figure-caption" style="text-align: center; margin-bottom: 20px;">
+                    圖中顯示整體條紋間距 $\lambda$（黑線）、透明區長度（藍線）與白色區長度（橘線）隨牽引速率變化的趨勢。
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">現象觀察與原理解釋</div>
+                <p>
+                    根據圖 5.1 的實驗數據，我們將整體條紋間距定義為 $\lambda$，其由黏著階段的白色條紋長度（$\lambda_{stick}$）與滑移階段的透明條紋長度（$\lambda_{slip}$）組成，即：
+                </p>
+                <div style="text-align: center; font-size: 18px; margin: 20px 0; font-weight: bold; color: #c0392b;">
+                    $$\lambda = \lambda_{stick} + \lambda_{slip}$$
+                </div>
+                <p>
+                    隨著牽引速率增加，我們觀察到以下特徵長度變化，並可藉由微觀物理機制進行解釋：
+                </p>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>白色條紋（$\lambda_{stick}$）長度與速率成反比：</strong> 白色區域對應系統累積彈性位能的黏著階段（Stick Phase）。當馬達牽引速率提升時，系統能在更短的時間內累積張力並達到觸發瞬間滑移的「臨界力量」。因此，黏膠被拉伸而產生微觀孔洞（拉絲現象）的空間距離被迫縮短，導致白色帶長度隨速度增加而急遽下降。
+                    </li>
+                    <li>
+                        <strong>透明條紋（$\lambda_{slip}$）長度與速率成正比：</strong> 透明區域對應快速滑移釋放階段（Slip Phase）。在較高牽引速率下，系統進入滑移階段時擁有較大的初始動能與應變率，使得黏膠以玻璃態發生脆性斷裂的滑行距離變長，因此透明帶長度隨速度增加而呈上升趨勢。
+                    </li>
+                    <li>
+                        <strong>整體條紋間距（$\lambda$）與速率成反比：</strong> 雖然透明帶的長度隨速率增加，但白色帶長度縮減的幅度與主導性更為顯著。兩者相加後的總和 $\lambda$ 在整體趨勢上依然呈現隨牽引速率增加而遞減的現象。這解釋了為什麼我們在高速撕扯膠帶時，觀察到的條紋會變得更加細密。
+                    </li>
+                </ul>
+            </div>
+
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab6')">下一頁：6. 結論與參考 &rarr;</button>
+            </div>
+        </div>
+
+        <!-- ================= 頁籤 6：結論與參考 ================= -->
+        <div id="tab6" class="tab-content">
+            <div class="card">
+                <div class="section-title">研究結論</div>
+                <p>根據本研究（探討透明膠帶剝離速度對條紋形成之影響）的實驗與數據分析，我們歸納出以下三點重要結論：</p>
+                
+                <h3 class="conclusion-subtitle">1. 建構定量化的剝離力學量測系統</h3>
+                <p>
+                    本研究自行設計並架設一套結合「步進馬達」與「拉力感測器」的三滑輪牽引系統。該裝置能精確控制透明膠帶的剝離速率，並即時擷取剝離過程中的微小動態張力變化，將日常生活中難以量測的「撕膠帶」現象，轉化為可重複且科學化的實驗數據。
+                </p>
+
+                <h3 class="conclusion-subtitle">2. 牽引速率決定高分子相態與三種動態區域</h3>
+                <p>實驗證實，膠帶剝離的動態特徵會隨牽引速率劃分為三大區域，並受高分子底波拉數（$De$）主導：</p>
+                <ul class="mechanism-list">
+                    <li>
+                        <strong>極慢區（橡膠態）：</strong> 
+                        在極低的底波拉數（$De \ll 1$）下，高分子鏈具備充分的時間進行鬆弛。材料處於力學上的「橡膠平坦區」，黏彈模數保持恆定，使得剝離拉力對速率變化不敏感，呈現趨近水平的穩定狀態。
+                    </li>
+                    <li>
+                        <strong>不穩定區（黏滑現象）：</strong> 
+                        當速率進入臨界區間，系統陷入「黏著（Stick）」與「瞬間滑移（Slip）」的高速動態循環，產生寬幅且劇烈的鋸齒狀拉力震盪，無法維持穩定的剝離力。
+                    </li>
+                    <li>
+                        <strong>快速區（玻璃態）：</strong> 
+                        在高底波拉數（$De \gg 1$）下，高分子來不及鬆弛，黏膠轉變為脆性的「玻璃態」斷裂，使整體拉力基準驟降。然而，隨著速率在對數尺度上繼續提升，受高分子的「黏彈硬化效應（Viscoelastic stiffening）」影響，材料表現出更高的剛性，導致克服界面的剝離阻力呈現明顯的上升趨勢。
+                    </li>
+                </ul>
+
+                <h3 class="conclusion-subtitle">3. 條紋特徵長度與牽引速率的物理規律</h3>
+                <p>使用游標卡尺測量，我們得出條紋間距（$\lambda = \lambda_{stick} + \lambda_{slip}$）的演變機制：</p>
+                <ul class="mechanism-list">
+                    <li><strong>白色條紋（$\lambda_{stick}$）隨速率遞減：</strong>速率越快，系統能在越短的拉伸距離內累積至臨界破壞張力，導致拉絲區域變窄。</li>
+                    <li><strong>透明條紋（$\lambda_{slip}$）隨速率遞增：</strong>速率越快，進入滑移階段時的初始動能與應變率越大，使脆性斷裂的滑行距離延長。</li>
+                    <li><strong>整體條紋間距（$\lambda$）隨速率遞減：</strong>由於白色條紋縮減的幅度佔據主導地位，整體條紋間距與牽引速率呈反比。解釋「撕膠帶速度越快，殘留的條紋就越細密」的日常觀察。</li>
+                </ul>
+
+                <p style="margin-top: 25px; padding: 15px; background-color: #fdf2f2; border-left: 4px solid #c0392b; color: #2c3e50; font-weight: bold;">
+                    本研究透過宏觀的「彈簧-滑塊模型」與微觀的「高分子斷裂力學」，揭示透明膠帶黏滑不穩定性（Stick-slip instability）的物理機制，證明尋常的日常現象背後，同樣蘊含著值得嚴謹探討的複雜力學原理。
+                </p>
+
+                <div class="team-box">
+                    <h4>👨‍🔬 專題發表團隊資訊</h4>
+                    <p style="margin-bottom:6px;"><strong>發表會議：</strong> 2026 物理教育聯合會議（大專生組壁報論文）</p>
+                    <p style="margin-bottom:6px;"><strong>課程專題：</strong> 基礎物理實驗學 2B 期末專題</p>
+                    <p style="margin-bottom:6px;"><strong>機構學校：</strong> 國立中正大學</p>
+                    <p style="margin-bottom:6px;"><strong>研究作者：</strong> 蔡政達、吳昌育、張中睿</p>
+                    <p style="margin-bottom:6px;"><strong>指導教授：</strong> 段必輝</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section-title">參考資料（References）</div>
+                <ul style="color: #4a5568; line-height: 1.8; padding-left: 20px;">
+                    <li>Grzelka, M., Kooij, S., Woutersen, S., Adda-Bedia, M., & Bonn, D. (2022).<i>Transition from viscoelastic to fracture-like peeling of pressure-sensitive adhesives.</i> Soft Matter, 18(5), 999-1004.</li>
+                    <li>Everaerts, A. I., & Clemens, L. M. (2002). <i>Chapter 11 - Pressure sensitive adhesives.</i> In D. A. Dillard, A. V. Pocius, & M. Chaudhury (Eds.), Adhesion Science and Engineering (pp. 465–534). Elsevier Science B.V. doi.org</li>
+                </ul>
+            </div>
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab7')">下一頁：7. 互動模擬器 &rarr;</button>
+            </div>
+        </div>
+
+        <!-- ================= 頁籤 7：互動模擬器 ================= -->
+        <div id="tab7" class="tab-content">
+            <div class="card">
+                <div class="section-title">互動實驗模擬器</div>
+                <p>
+                    下方為我們開發的黏滑不穩定剝離模擬器。你可以親自透過調整牽引速度（Pulling Speed），觀察張力-時間波形的變化以及膠帶上生成的條紋演變！
+                </p>
+                <div style="width: 100%; min-height: 500px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background-color: #fafafa; padding: 10px; box-sizing: border-box;">
+                    <iframe src="simulator.html" width="100%" height="750px" style="border: none; border-radius: 8px; overflow: hidden;" scrolling="yes"></iframe>
+                </div>
+            </div>
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab8')">下一頁：8. A1 壁報 &rarr;</button>
+            </div>
+        </div>
+        
+        <!-- ================= 頁籤 8：A1 壁報 ================= -->
+        <div id="tab8" class="tab-content">
+            <div class="card">
+                <div class="section-title">A1 實體壁報展示</div>
+                <p>
+                    下方為我們參與 2026 物理教育聯合會議（大專生組）時所展示的 A1 規格實體壁報。彙整本研究的核心實驗方法與量測結果。
+                </p>
+                
+                <div class="poster-wrapper">
+                    <!-- 請將此處的 src 替換為實際的壁報圖片檔名 (例如 poster.png 或 poster.jpg) -->
+                    <img src="poster.png" alt="2026 物理教育聯合會議 A1 壁報">
+                </div>
+                <div class="figure-title">2026 物理教育聯合會議 參展壁報</div>
+                
+            </div>
+            <div class="page-footer-nav">
+                <button class="next-page-btn" onclick="switchTab('tab1')">回到第一頁：1. 前言 &#8634;</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= 頁尾版權聲明 ================= -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <img src="ccu-logo.png" alt="CCU Physics Logo" class="footer-logo">
+            <div class="footer-text">
+                &copy; 2026 Chang-Yu Wu (Web Developer), Zheng-Da Tsai, and Zhung-Rui Zhang.<br>
+                Advisor: Prof. Pi-Hui Tuan<br>
+                Final Project for Experiments on fundamental Physics 2B, National Chung Cheng University.<br>
+                Prepared for the 2026 Joint Physics Education Meeting of ROC. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            var contents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active-tab");
+            }
+            
+            var btns = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].classList.remove("active");
+            }
+            
+            var targetContent = document.getElementById(tabId);
+            if (targetContent) {
+                targetContent.classList.add("active-tab");
+            }
+
+            var targetBtn = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+            if (targetBtn) {
+                targetBtn.classList.add("active");
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

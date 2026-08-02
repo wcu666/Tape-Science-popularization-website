@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigation Influences of Pulling Speed on Stripe Pattern Formation of Peeled Tape</title>
+    <style>
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2000'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.2; 
+        }
+
+        body {
+            background-color: #f4f6f8; 
+            color: #333333; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-title {
+            font-family: 'Times New Roman', Times, serif;
+            text-align: center;
+            margin: 30px 20px 10px 20px;
+            font-size: 28px;
+            color: #1a252f;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+    
+        .dashboard {
+            display: flex;
+            flex-direction: row; 
+            flex-wrap: wrap; 
+            justify-content: center;
+            align-items: flex-start; 
+            gap: 30px;
+            background-color: #ffffff; 
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+            max-width: 100%;
+        }
+
+        .simulation-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .simulation-wrapper {
+            position: relative;
+            width: 800px;
+            height: 320px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .simulation-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 800px;  
+            height: 320px; 
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden; 
+            background-color: #ffffff; 
+            transform-origin: top left;
+        }
+
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none; 
+        }
+
+        .part {
+            position: absolute;
+            transform-origin: center center;
+            pointer-events: none; 
+        }
+        
+        #line-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #bg2 { z-index: 1; } 
+        #bg1 { z-index: 3; } 
+        #bg3 { z-index: 5; } 
+        #line-canvas { z-index: 4; }
+        #cart { z-index: 2; width: 815px; }
+        #pulley-bottom { z-index: 2; width: 815px; }
+        #pulley-top { z-index: 2; width: 815px; }
+        #movable-body { z-index: 2; width: 815px; }
+        #wheel { z-index: 3; width: 815px; } 
+        #tape-dispenser { z-index: 1; width: 815px; } 
+
+        .controls { 
+            position: relative; 
+            z-index: 999;       
+            background-color: #f8f9fa; 
+            border: 1px solid #e9ecef;
+            padding: 15px; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-wrap: wrap;
+            gap: 10px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .controls label { font-weight: bold; color: #333; }
+        .controls input { 
+            width: 70px; 
+            padding: 6px; 
+            background: #ffffff; 
+            border: 1px solid #ced4da; 
+            color: #333; 
+            border-radius: 4px; 
+            text-align: center; 
+            font-weight: bold;
+        }
+        .controls button { 
+            padding: 6px 20px; 
+            background-color: #0076ff; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.2s; 
+        }
+        .controls button:hover { background-color: #0055cc; }
+
+        .camera-panel { 
+            width: 320px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+            max-width: 100%; 
+        }
+        
+        .camera-screen { 
+            height: 200px; 
+            background-color: #2c2c2c; 
+            border: 3px solid #555; 
+            border-radius: 8px; 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            padding: 0 10px;
+        }
+        .rec-dot { position: absolute; top: 10px; right: 15px; color: #ff4757; font-weight: bold; font-size: 14px; animation: blink 1s infinite; z-index: 10;}
+        .speed-display { position: absolute; top: 10px; left: 15px; color: #2ed573; font-family: monospace; font-size: 14px; z-index: 10; font-weight: bold;}
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .tape-track {
+            width: 100%;
+            height: 110px;
+            border-top: 18px solid #1e272e;
+            border-bottom: 18px solid #1e272e;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            background-color: rgba(136, 136, 136, 0.2); 
+        }
+        
+        .tape-stripes { 
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            transform: translateX(100%); 
+            transition: none;
+        }
+
+        .site-footer {
+            background-color: #e9ecef; 
+            color: #6c757d; 
+            padding: 20px;
+            font-size: 14px;
+            margin-top: auto; 
+            display: flex;
+            justify-content: center; 
+        }
+        .footer-content {
+            display: flex;
+            align-items: center; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+        .footer-logo {
+            width: 70px; 
+            height: auto;
+        }
+        .footer-text {
+            text-align: left; 
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard {
+                flex-direction: column;
+                align-items: center;
+            }
+            .footer-text { text-align: center; }
+        }
+
+        @media (max-width: 860px) {
+            .simulation-wrapper { width: 640px; height: 256px; }
+            .simulation-container { transform: scale(0.8); }
+        }
+        @media (max-width: 700px) {
+            .simulation-wrapper { width: 480px; height: 192px; }
+            .simulation-container { transform: scale(0.6); }
+        }
+        @media (max-width: 520px) {
+            .simulation-wrapper { width: 360px; height: 144px; }
+            .simulation-container { transform: scale(0.45); }
+        }
+        @media (max-width: 400px) {
+            .simulation-wrapper { width: 300px; height: 120px; }
+            .simulation-container { transform: scale(0.375); }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .dashboard {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+            }
+            .simulation-wrapper { width: 400px; height: 160px; }
+            .simulation-container { transform: scale(0.5); }
+            .camera-panel { width: 260px; }
+            .camera-screen { height: 160px; }
+            .tape-track { height: 80px; }
+        }
+
+        .tape-legend {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14.5px;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .tape-legend strong {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-bg"></div>
+
+    <h1 class="main-title">Investigation Influences of Pulling Speed on Stripe Pattern Formation of Peeled Tape </h1>
+
+    <div class="content-wrapper">
+        <div class="dashboard">
+            
+            <div class="simulation-panel">
+                <h3 style="margin:0; color:#333; align-self: flex-start;">Simulation Console</h3>
+                
+                <div class="simulation-wrapper">
+                    <div class="simulation-container">
+                        <img src="bg1.png" class="bg-layer" id="bg1">
+                        <img src="bg2.png" class="bg-layer" id="bg2">
+                        <img src="bg3.png" class="bg-layer" id="bg3">
+
+                        <svg id="line-canvas">
+                            <line id="line1" stroke="#000000" stroke-width="0.8" />
+                            <line id="line2" stroke="#000000" stroke-width="0.8" />
+                            <line id="line3" stroke="#000000" stroke-width="0.8" />
+                            <line id="line4" stroke="#000000" stroke-width="0.8" />
+                            <line id="line5" stroke="#000000" stroke-width="0.8" />
+                        </svg>
+
+                        <img src="cart.png" class="part" id="cart">
+                        <img src="pulley-bottom.png" class="part" id="pulley-bottom">
+                        <img src="pulley-top.png" class="part" id="pulley-top">
+                        <img src="movable-body.png" class="part" id="movable-body">
+                        
+                        <img src="wheel.png" class="part" id="wheel">
+                        <img src="tape-dispenser.png" class="part" id="tape-dispenser">
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <label for="delayInput">Step Delay:</label>
+                    <input type="number" id="delayInput" value="212">
+                    <span style="color:#333; font-weight:bold;">ms</span>
+                    <button id="startBtn">Start</button>
+                    
+                    <div id="error-msg" style="display: none; color: #ff4757; font-weight: bold; width: 100%; text-align: center; margin-top: 10px;">
+                        Invalid Step Delay! Please enter a positive integer greater than 0.
+                    </div>
+                </div>
+            </div> 
+
+            <div class="camera-panel">
+                <h3 style="margin:0; color:#333;">Micro-Camera</h3>
+                <div class="camera-screen">
+                    <div class="rec-dot">● REC</div>
+                    <div class="speed-display" id="speed-display">0.00 mm/s</div>
+                    <div class="tape-track" id="tape-track">
+                        <div class="tape-stripes" id="tape-stripes"></div>
+                    </div>
+                </div>
+                
+                <div class="tape-legend">
+                    <strong>White Zone (Stick):</strong> Opaque band from polymer fibrillation.<br>
+                    <strong>Transparent Zone (Slip):</strong> Clear band from rapid, clean detachment.
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <img src="ccu-logo.png" alt="CCU Physics Logo" class="footer-logo">
+            <div class="footer-text">
+                &copy; 2026 Chang-Yu Wu (Web Developer), Zheng-Da Tsai, and Zhung-Rui Zhang.<br>
+                Advisor: Prof. Pi-Hui Tuan<br>
+                Final Project for Experiments on fundamental Physics 2B, National Chung Cheng University.
+                Prepared for the 2026 Joint Physics Education Meeting of ROC. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const delayInput = document.getElementById('delayInput');
+        const startBtn = document.getElementById('startBtn');
+        const speedDisplay = document.getElementById('speed-display');
+        const errorMsg = document.getElementById('error-msg');
+        
+        const cart = document.getElementById('cart');
+        const pulleyBottom = document.getElementById('pulley-bottom');
+        const pulleyTop = document.getElementById('pulley-top');
+        const movableBody = document.getElementById('movable-body');
+        const wheel = document.getElementById('wheel');
+        const tapeDispenser = document.getElementById('tape-dispenser');
+        const tapeStripes = document.getElementById('tape-stripes');
+
+        const motorX = 50, motorY = 270;               
+        const tapeAnchorX = 737, tapeAnchorY = 147;   
+        const frameAnchorX = 517, frameAnchorY =132; 
+        const pBottomX = 75, pBottomY = 31;           
+        const pTopX = 96, pTopY = -64;                
+
+        const initialWheelX = 262; 
+        let wheelX = initialWheelX;  
+        const wheelY = -85;
+
+        const tapeDispX = 347, tapeDispY = -82;
+
+        let cartX = -70;            
+        const cartY = 52;           
+        let stopCartX = -170;       
+        
+        let movableX = 266;         
+        const movableY = -85;       
+        
+        let fixedAngle = 0;         
+        let isRunning = false;
+        let timer = null;
+
+        function updateTapeAppearance() {
+            let delay = parseInt(delayInput.value);
+
+            if (isNaN(delay) || delay <= 0) {
+                speedDisplay.textContent = 'Invalid';
+                speedDisplay.style.color = '#ff4757'; 
+                tapeStripes.style.background = 'transparent'; 
+                return;
+            } else {
+                speedDisplay.style.color = '#2ed573'; 
+            }
+
+            let speed = 4.625 / delay;
+            speedDisplay.textContent = (speed*10).toFixed(4) + ' mm/s';
+
+            if (delay >= 400) {
+                // 低速：全白 (Stick 狀態)
+                tapeStripes.style.background = '#ffffff';
+            } else if (delay <= 24) {
+                // 高速：近乎全透明 (Slip 狀態)，保留極稀疏、極淡的痕跡防止突變
+                tapeStripes.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(136,136,136,0.15) 100%)';
+            } else {
+                // 中間速度：Stick-Slip 週期斑紋
+                let ratio = (delay - 24) / (400 - 24); 
+                let cycleLength = 30; // 稍微縮短週期長度，讓高拉速下的白條紋更密集、不易在結束時被擠出視窗
+                let whitePx = cycleLength * ratio; 
+                
+                // 確保白紋即使在極端狀況下也至少保有一點點寬度（例如 1.5px），不會直接消失
+                if (whitePx < 1.5) whitePx = 1.5; 
+                
+                let grayAlpha = 0.15 + (0.65 * ratio); 
+                let grayColor = `rgba(136, 136, 136, ${grayAlpha})`;
+
+                tapeStripes.style.background = `repeating-linear-gradient(90deg, #ffffff, #ffffff ${whitePx}px, ${grayColor} ${whitePx}px, ${grayColor} ${cycleLength}px)`;
+            }
+        }
+
+        delayInput.addEventListener('input', updateTapeAppearance);
+
+        function initPositions() {
+            cart.style.left = cartX + 'px';
+            cart.style.top = cartY + 'px';
+            pulleyBottom.style.left = pBottomX + 'px';
+            pulleyBottom.style.top = pBottomY + 'px';
+            pulleyTop.style.left = pTopX + 'px';
+            pulleyTop.style.top = pTopY + 'px';
+            movableBody.style.left = movableX + 'px';
+            movableBody.style.top = movableY + 'px';
+            
+            wheel.style.left = wheelX + 'px';
+            wheel.style.top = wheelY + 'px';
+            tapeDispenser.style.left = tapeDispX + 'px';
+            tapeDispenser.style.top = tapeDispY + 'px';
+            
+            let distanceMoved = -70 - cartX; 
+            let progress = distanceMoved / 100; 
+            if (progress < 0) progress = 0;
+            if (progress > 1) progress = 1;
+            
+            let translatePercent = (1 - progress) * 100;
+            tapeStripes.style.transform = `translateX(${translatePercent}%)`;
+
+            drawAllLines();
+            updateTapeAppearance(); 
+        }
+
+        startBtn.addEventListener('click', () => {
+            let delay = parseInt(delayInput.value);
+    
+            if (isNaN(delay) || delay <= 0) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+    
+            errorMsg.style.display = 'none';
+
+            if (isRunning) {
+                isRunning = false;
+                startBtn.textContent = 'Start';
+                startBtn.style.backgroundColor = '#0076ff';
+                clearTimeout(timer);
+            } else {
+                cartX = -70;            
+                movableX = 266;
+                wheelX = initialWheelX;  
+                fixedAngle = 0;         
+                initPositions(); 
+
+                isRunning = true;
+                startBtn.textContent = 'Stop';
+                startBtn.style.backgroundColor = '#ff3b30';
+        
+                updateTapeAppearance(); 
+                runSimulation();
+            }
+        });
+
+        function runSimulation() {
+            if (!isRunning) return;
+
+            cartX -= 2;             
+            movableX -= 2;          
+            wheelX -= 2;   
+            fixedAngle -= 5;        
+
+            let distanceMoved = -70 - cartX; 
+            let progress = distanceMoved / 100; 
+            if (progress > 1) progress = 1;
+
+            let translatePercent = (1 - progress) * 100;
+            tapeStripes.style.transform = `translateX(${translatePercent}%)`;
+
+            if (cartX <= stopCartX) {
+                cartX = stopCartX;
+                movableX = 266 - (-70 - stopCartX);
+                wheelX = initialWheelX - (-70 - stopCartX); 
+                
+                // 🌟 修正點：動畫結束時，維持平移進度在 0% 展現完整花紋
+                tapeStripes.style.transform = `translateX(0%)`;
+                
+                // 🌟 修正點：確保停止時，背景斑紋依據目前的 delay 進行最後一次完美渲染
+                updateTapeAppearance();
+                
+                isRunning = false;
+                startBtn.textContent = 'Start'; 
+                startBtn.style.backgroundColor = '#0076ff';
+                clearTimeout(timer);
+                return;
+            }
+
+            cart.style.left = cartX + 'px';
+            movableBody.style.left = movableX + 'px';
+            wheel.style.left = wheelX + 'px'; 
+            
+            pulleyBottom.style.transform = `rotate(${-fixedAngle}deg)`;
+            pulleyTop.style.transform = `rotate(${fixedAngle}deg)`;
+            tapeDispenser.style.transform = `rotate(${fixedAngle}deg)`; 
+            wheel.style.transform = `rotate(${-fixedAngle}deg)`;        
+
+            drawAllLines();
+
+            if (isRunning) {
+                let currentDelay = parseInt(delayInput.value) || 30;
+                timer = setTimeout(runSimulation, currentDelay);
+            }
+        }
+
+        function drawAllLines() {
+            const line1 = document.getElementById('line1');
+            const line2 = document.getElementById('line2');
+            const line3 = document.getElementById('line3');
+            const line4 = document.getElementById('line4');
+            const line5 = document.getElementById('line5');
+
+            updateSVGLine(line1, motorX, motorY, cartX + 400, cartY+220 );
+            updateSVGLine(line2, cartX + 436, cartY + 219, pBottomX + 407, pBottomY + 240);
+            updateSVGLine(line3, pTopX + 415, pTopY + 220, movableX + 400, movableY + 241);
+            updateSVGLine(line4, movableX + 444, movableY + 232, tapeAnchorX, tapeAnchorY);
+            updateSVGLine(line5, movableX + 402, movableY + 217, frameAnchorX, frameAnchorY);
+        }
+
+        function updateSVGLine(line, x1, y1, x2, y2) {
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+        }
+
+        initPositions();
+    </script>
+</body>
+</html>
