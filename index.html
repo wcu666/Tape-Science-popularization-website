@@ -1,4 +1,287 @@
-ㄏumn;
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigation Influences of Pulling Speed on Stripe Pattern Formation of Peeled Tape</title>
+    <style>
+        /* ================= 1. 全域樣式 ================= */
+        body {
+            font-family: 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
+            color: #2c3e50;
+            line-height: 1.85;
+            margin: 0;
+            padding: 0;
+            background-color: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex: 1;
+        }
+
+        /* 頂部頁籤導覽列 */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #dcdde1;
+            margin-bottom: 40px;
+            font-size: 15px;
+            color: #7f8c8d;
+            flex-wrap: wrap;
+        }
+        .navbar .tab-btn {
+            cursor: pointer;
+            padding-bottom: 8px;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        .navbar .tab-btn:hover {
+            color: #2c3e50;
+        }
+        .navbar .tab-btn.active {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .navbar .tab-btn.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 100%;
+            height: 2.5px;
+            background-color: #c0392b;
+        }
+
+        /* 標題區域 */
+        .header-section {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+        .main-title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #1a252f;
+            margin-bottom: 15px;
+            line-height: 1.35;
+            letter-spacing: 0.5px;
+        }
+        .sub-title {
+            font-size: 16px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* 頁籤內容隱藏與切換動畫 */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active-tab {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= 2. 卡片區域 (Card Layout) ================= */
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f2f6;
+        }
+
+        .section-title {
+            font-size: 21px;
+            font-weight: 700;
+            color: #2c3e50;
+            border-left: 4px solid #c0392b;
+            padding-left: 14px;
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #4a5568;
+            text-align: justify;
+            margin-bottom: 16px;
+        }
+        p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ================= 3. 圖片組件 ================= */
+        .image-zone {
+            display: flex;
+            gap: 24px;
+            margin-top: 15px;
+        }
+        .figure-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 250px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-wrapper-wide {
+            width: 100%;
+            height: 380px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .image-wrapper-wide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .figure-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .figure-caption {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        /* ================= 4. 頁尾「下一頁」按鈕 ================= */
+        .page-footer-nav {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        .next-page-btn {
+            background-color: #c0392b;
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(192, 57, 43, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .next-page-btn:hover {
+            background-color: #a93226;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(192, 57, 43, 0.3);
+        }
+
+        /* ================= 5. 其他輔助元素 ================= */
+        ul.mechanism-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 15px;
+        }
+        ul.mechanism-list li {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 16px;
+            padding-left: 20px;
+            position: relative;
+            text-align: justify;
+        }
+        ul.mechanism-list li::before {
+            content: "■";
+            color: #c0392b;
+            font-size: 12px;
+            position: absolute;
+            left: 0;
+            top: 3px;
+        }
+
+        .team-box {
+            background-color: #f8fafc;
+            border-radius: 6px;
+            padding: 20px 25px;
+            border-left: 4px solid #2c3e50;
+            margin-top: 30px;
+        }
+        .team-box h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 17px;
+        }
+
+        hr.divider {
+            border: 0;
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 25px 0;
+        }
+        .image-center-free {
+            text-align: center;
+            margin: 25px 0;
+        }
+        .image-center-free img {
+            max-width: 50%;
+            height: auto;
+        }
+        .conclusion-subtitle {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        /* ================= 6. 頁尾版權聲明 (Footer) ================= */
+        .site-footer {
+            background-color: #f1f2f6;
+            padding: 35px 20px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: auto;
+        }
+        .footer-content {
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             max-width: 920px;
@@ -357,20 +640,20 @@
                     根據圖 5.1 的實驗數據，我們將整體條紋間距定義為 $\lambda$，其由黏著階段的白色條紋長度（$\lambda_{stick}$）與滑移階段的透明條紋長度（$\lambda_{slip}$）組成，即：
                 </p>
                 <div style="text-align: center; font-size: 18px; margin: 20px 0; font-weight: bold; color: #c0392b;">
-                    $$\lambda = d_{stick} + d_{slip}$$
+                    $$\lambda = \lambda_{stick} + \lambda_{slip}$$
                 </div>
                 <p>
                     隨著牽引速率增加，我們觀察到以下特徵長度變化，並可藉由微觀物理機制進行解釋：
                 </p>
                 <ul class="mechanism-list">
                     <li>
-                        <strong>白色條紋（$d_{stick}$）長度與速率成負相關：</strong> 白色區域對應系統累積彈性位能的黏著階段（Stick Phase）。當馬達牽引速率提升時，系統能在更短的時間內累積張力並達到觸發瞬間滑移的「臨界力量」。因此，黏膠被拉伸而產生微觀孔洞的空間距離被迫縮短，導致白色帶長度隨速度增加而急遽下降。
+                        <strong>白色條紋（$\lambda_{stick}$）長度與速率成反比：</strong> 白色區域對應系統累積彈性位能的黏著階段（Stick Phase）。當馬達牽引速率提升時，系統能在更短的時間內累積張力並達到觸發瞬間滑移的「臨界力量」。因此，黏膠被拉伸而產生微觀孔洞的空間距離被迫縮短，導致白色帶長度隨速度增加而急遽下降。
                     </li>
                     <li>
-                        <strong>透明條紋（$d_{slip}$）長度與速率成正相關：</strong> 透明區域對應快速滑移釋放階段（Slip Phase）。在較高牽引速率下，系統進入滑移階段時擁有較大的初始動能與應變率，使得黏膠以玻璃態發生脆性斷裂的滑行距離變長，因此透明帶長度隨速度增加而呈上升趨勢。
+                        <strong>透明條紋（$\lambda_{slip}$）長度與速率成正比：</strong> 透明區域對應快速滑移釋放階段（Slip Phase）。在較高牽引速率下，系統進入滑移階段時擁有較大的初始動能與應變率，使得黏膠以玻璃態發生脆性斷裂的滑行距離變長，因此透明帶長度隨速度增加而呈上升趨勢。
                     </li>
                     <li>
-                        <strong>整體條紋間距（$\lambda$）與速率成負相關：</strong> 雖然透明帶的長度隨速率增加，但白色帶長度縮減的幅度與主導性更為顯著。兩者相加後的總和 $\lambda$ 在整體趨勢上依然呈現隨牽引速率增加而遞減的現象。這解釋為什麼我們在高速撕扯膠帶時，觀察到的條紋會變得更加細密。
+                        <strong>整體條紋間距（$\lambda$）與速率成反比：</strong> 雖然透明帶的長度隨速率增加，但白色帶長度縮減的幅度與主導性更為顯著。兩者相加後的總和 $\lambda$ 在整體趨勢上依然呈現隨牽引速率增加而遞減的現象。這解釋為什麼我們在高速撕扯膠帶時，觀察到的條紋會變得更加細密。
                     </li>
                 </ul>
             </div>
@@ -409,10 +692,10 @@
                 </ul>
 
                 <h3 class="conclusion-subtitle">3. 條紋特徵長度與牽引速率的物理規律</h3>
-                <p>使用游標卡尺測量，我們得出條紋間距（$\lambda = d_{stick} + d_{slip}$）的演變機制：</p>
+                <p>使用游標卡尺測量，我們得出條紋間距（$\lambda = \lambda_{stick} + \lambda_{slip}$）的演變機制：</p>
                 <ul class="mechanism-list">
-                    <li><strong>白色條紋（$d_{stick}$）隨速率遞減：</strong>速率越快，系統能在越短的拉伸距離內累積至臨界破壞張力，導致拉絲區域變窄。</li>
-                    <li><strong>透明條紋（$d_{slip}$）隨速率遞增：</strong>速率越快，進入滑移階段時的初始動能與應變率越大，使脆性斷裂的滑行距離延長。</li>
+                    <li><strong>白色條紋（$\lambda_{stick}$）隨速率遞減：</strong>速率越快，系統能在越短的拉伸距離內累積至臨界破壞張力，導致拉絲區域變窄。</li>
+                    <li><strong>透明條紋（$\lambda_{slip}$）隨速率遞增：</strong>速率越快，進入滑移階段時的初始動能與應變率越大，使脆性斷裂的滑行距離延長。</li>
                     <li><strong>整體條紋間距（$\lambda$）隨速率遞減：</strong>由於白色條紋縮減的幅度佔據主導地位，整體條紋間距與牽引速率呈反比。解釋「撕膠帶速度越快，殘留的條紋就越細密」的日常觀察。</li>
                 </ul>
 
@@ -518,77 +801,4 @@
         }
     </script>
 </body>
-膠態（Rubbery state）」。此時受力會產生巨觀的拉絲現象，在膠帶上留下粗糙表面，即我們觀察到的 <strong>White Zone</strong>。
-                    </li>
-                    <li>
-                        <strong>高速牽引（$De &gt; 1$）：</strong> 牽引時間極短，黏膠被迫進入「玻璃態（Glassy state）」。此時發生脆性斷裂與乾淨的界面破壞，剝離面維持平整，即 <strong>Transparent Zone</strong>。
-                    </li>
-                </ul>
-            </div>
-            <div class="card">
-                <div class="section-title">3. 剝離拉力特徵：橡膠平坦區與黏彈硬化效應</div>
-                <p>
-                    承接上述底波拉數（$De$）所主導的相態轉換，我們可進一步從高分子流變學的角度，解釋不同相態下剝離拉力隨速率變化的力學特徵：
-                </p>
-                <ul class="mechanism-list">
-                    <li>
-                        <strong>橡膠平坦區（極慢區）：</strong> 當 $De < 1$ 時，高分子處於完全鬆弛的橡膠態。在力學上，此區間對應高分子的「橡膠平坦區（Rubbery plateau）」，表示材料的黏彈模數（彈性）幾乎是一個常數，不會隨著形變速率的微小變化而改變。因此，在極慢速牽引下，剝離拉力對速度不敏感，所以力趨近水平的現象。
-                    </li>
-                    <li>
-                        <strong>黏彈硬化效應（極快區）：</strong> 當 $De > 1$ 時，黏膠被迫進入玻璃態並發生脆性斷裂。雖然巨觀拉絲消失使整體力量基準下降，但微觀層面上，若牽引速率繼續對數級別地提升（應變率急遽增加），高分子材料會產生「黏彈硬化（Viscoelastic stiffening）」現象。其等效黏彈模數會隨速率增加而變大（材料變得更僵硬），導致克服界面斷裂所需的拉力也隨之提高，這解釋快速區拉力呈現上升趨勢的力學原因。
-                    </li>
-                </ul>
-            </div>
-            <div class="page-footer-nav">
-                <button class="next-page-btn" onclick="switchTab('tab4')">下一頁：4. 實驗一 &rarr;</button>
-            </div>
-        </div>
-        
-
-        <!-- ================= 頁籤 4：實驗一 ================= -->
-        <div id="tab4" class="tab-content">
-            <div class="card">
-                <div class="section-title">尋找臨界牽引速率與三區劃分</div>
-                <p>
-                    為了界定膠帶剝離時黏滑現象發生的條件，我們透過微控器逐步調整步進馬達的牽引速率，並記錄對應的平均剝離拉力。實驗結果顯示，系統動態特徵隨牽引速率的增加可清晰劃分為「三大區域」，並對「極慢區」與「極快區」分別進行趨勢線擬合：
-                </p>
-                <div class="image-center-free">
-                    <img src="figure_3_1.png" alt="圖 4.1 牽引速率與剝離拉力之三區劃分圖">
-                </div>
-                <div class="figure-title">圖 4.1 牽引速率與剝離拉力之三區劃分圖</div>
-                <div class="figure-caption" style="text-align: center; margin-bottom: 20px;">
-                    圖中繪製極慢區與極快區之擬合趨勢線；中間不穩定區則呈現劇烈波動之數據散佈。
-                </div>
-                <ul class="mechanism-list">
-                    <li>
-                        <strong>Ⅰ. 極慢速區（水平趨勢線）：</strong> 
-                        在此極慢速範圍內，高分子底波拉數極小（$De \ll 1$），黏膠處於橡膠態，剝離時伴隨顯著的黏膠拉絲現象。因為高分子鏈具備充分時間鬆弛（處於力學上的橡膠平坦區），其黏彈模數對速率變化不敏感。整體剝離阻力維持在一個穩定的常數，因此擬合趨勢線合理地趨近於水平。
-                    </li>
-                    <li>
-                        <strong>Ⅱ. 不穩定區（劇烈震盪數據點）：</strong> 
-                        當速度進入不穩定區，系統陷入黏滑（Stick-Slip）動態循環。力量在「累積彈性位能（Stick）」與「瞬間釋放（Slip）」之間高速切換，導致數據點在固定區間內產生寬幅的劇烈震盪。
-                    </li>
-                    <li>
-                        <strong>Ⅲ. 快速區（上升趨勢線）：</strong> 
-                        跨過臨界速度後，底波拉數極大（$De \gg 1$），黏膠轉變為玻璃態，剝離面轉為乾淨的脆性斷裂，使整體力量基準顯著低於不穩定區。然而，隨著牽引速率繼續對數級別地提升，受高分子的<strong>「黏彈硬化效應（Viscoelastic stiffening）」</strong>影響，材料在極短時間內來不及形變，表現得更為僵硬。為了克服變硬的界面，剝離阻力會隨速度增加而變大，因此在此區段的擬合趨勢線呈現向上攀升的特徵。
-                    </li>
-                </ul>
-            </div>
-            <div class="card">
-                <div class="section-title">條紋特徵與動態拉力 (F-t) 關係</div>
-                <p>
-                    除了巨觀的平均拉力外，我們進一步將「膠帶條紋影像」與拉力感測器記錄的「力量-時間 (F-t) 曲線」進行比對，以驗證微觀剝離機制。
-                </p>
-                <div class="image-wrapper-wide">
-                    <img src="stripe_and_ft_graphs.png" alt="圖 4.2 不同速率下之條紋與 F-t 曲線對照 (慢至快)">
-                </div>
-                <div class="figure-title">圖 4.2 條紋影像與動態拉力 (F-t) 曲線對照圖</div>
-                <p style="margin-top: 20px;">
-                    上圖由左至右分別排列從「極慢速」、「不穩定臨界」一路到「快速」牽引條件下的對應結果：
-                </p>
-                <ul class="mechanism-list">
-                    <li>
-                        <strong>左側（慢速牽引）：</strong> F-t 曲線平緩，系統穩定處於黏滯拉伸狀態，膠帶影像為均勻的白色霧狀表面。
-                    </li>
-                    <li>
-                        <strong>中間（不穩定區 / 臨界點）：</s
+</html>
